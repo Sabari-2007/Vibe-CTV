@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  name      String?
+  email     String?    @unique
+  campaigns Campaign[]
+  createdAt DateTime   @default(now())
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  name        String
+  dailyBudget Float
+  totalBudget Float
+  spent       Float          @default(0)
+  genres      String         @default("[]")
+  locations   String         @default("[]")
+  videoUrl    String?
+  status      String         @default("ACTIVE")
+  userId      String?
+  user        User?          @relation(fields: [userId], references: [id])
+  analytics   AnalyticsLog[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model VideoProject {
+  id           String   @id @default(cuid())
+  name         String
+  status       String   @default("DRAFT")
+  sourceUrl    String?
+  script       String?
+  voiceProfile String?
+  audioTrack   String?
+  tracks       String   @default("[]")
+  assets       String   @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AnalyticsLog {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  channel    String
+  timestamp  DateTime @default(now())
+  eventType  String
+  cost       Float    @default(0)
+}
