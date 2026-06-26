@@ -15,6 +15,7 @@ export function LivePreview({ activeSlide, totalDuration }: LivePreviewProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>('')
   const [currentPreviewText, setCurrentPreviewText] = useState('')
   const [showTextEdit, setShowTextEdit] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const textEditRef = useRef<HTMLDivElement>(null)
 
   const progress = totalDuration > 0 ? (state.currentTime / totalDuration) * 100 : 0
@@ -29,6 +30,7 @@ export function LivePreview({ activeSlide, totalDuration }: LivePreviewProps) {
   }, [state.qrCode.enabled, state.bottomBanner.websiteUrl])
 
   useEffect(() => {
+    setImgError(false)
     if (activeSlide) {
       setCurrentPreviewText(state.businessName || state.tagline || 'Your Brand')
     }
@@ -62,11 +64,23 @@ export function LivePreview({ activeSlide, totalDuration }: LivePreviewProps) {
         </div>
       ) : activeSlide ? (
         <>
-          <img
-            src={activeSlide.imageUrl}
-            alt={activeSlide.label}
-            className="w-full h-full object-cover"
-          />
+          {imgError ? (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a2e] to-[#0d0d14]">
+              <div className="text-center">
+                <svg className="w-12 h-12 mx-auto mb-3 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+                <p className="text-white/30 text-xs">Failed to load image</p>
+              </div>
+            </div>
+          ) : (
+            <img
+              src={activeSlide.imageUrl}
+              alt={activeSlide.label}
+              className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
@@ -77,7 +91,7 @@ export function LivePreview({ activeSlide, totalDuration }: LivePreviewProps) {
           )}
 
           {state.qrCode.enabled && qrDataUrl && (
-            <div className="absolute top-3 right-3 w-14 h-14 rounded-xl bg-white shadow-lg flex items-center justify-center border border-white/20">
+            <div className="absolute top-3 right-3 w-14 h-14 rounded-xl bg-[#1a1a2e] shadow-lg flex items-center justify-center border border-white/20">
               <img src={qrDataUrl} alt="QR Code" className="w-12 h-12" />
             </div>
           )}
@@ -146,12 +160,12 @@ export function LivePreview({ activeSlide, totalDuration }: LivePreviewProps) {
           ))}
 
           {state.bottomBanner.companyName && (
-            <div className="absolute bottom-0 left-0 right-0 h-11 bg-white/95 backdrop-blur-md flex items-center px-4 gap-3 border-t border-white/20">
+            <div className="absolute bottom-0 left-0 right-0 h-11 bg-[#1a1a2e]/90 backdrop-blur-md flex items-center px-4 gap-3 border-t border-white/[0.06]">
               {state.bottomBanner.logoUrl && (
                 <img src={state.bottomBanner.logoUrl} alt="" className="w-6 h-6 object-contain rounded" />
               )}
-              <span className="text-black text-xs font-semibold">{state.bottomBanner.companyName}</span>
-              <span className="text-black/40 text-[10px] ml-auto truncate">{state.bottomBanner.websiteUrl}</span>
+              <span className="text-white/90 text-xs font-semibold">{state.bottomBanner.companyName}</span>
+              <span className="text-white/40 text-[10px] ml-auto truncate">{state.bottomBanner.websiteUrl}</span>
             </div>
           )}
 

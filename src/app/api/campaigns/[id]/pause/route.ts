@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { validateId } from '@/lib/sanitize'
 
 export async function POST(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!validateId(params.id)) {
+      return NextResponse.json({ error: 'Invalid campaign ID' }, { status: 400 })
+    }
+
     const campaign = await prisma.campaign.findUnique({
       where: { id: params.id },
     })

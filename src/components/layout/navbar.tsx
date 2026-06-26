@@ -1,11 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/lib/auth'
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, loading, logout } = useAuth()
 
   const links = [
     { href: '/', label: 'Home' },
@@ -13,6 +16,11 @@ export function Navbar() {
     { href: '/studio', label: 'Studio' },
     { href: '/campaign/new', label: 'New Campaign' },
   ]
+
+  function handleLogout() {
+    logout()
+    router.push('/')
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-muted">
@@ -46,13 +54,33 @@ export function Navbar() {
               </Link>
             )
           })}
-          <Link
-            href="/campaign/new"
-            className="ml-3 px-5 py-2 rounded-xl bg-accent text-white font-semibold text-sm hover:brightness-110 transition-all"
-            style={{ boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)' }}
-          >
-            Get Started
-          </Link>
+          {loading ? null : user ? (
+            <div className="flex items-center gap-2 ml-3">
+              <span className="text-sm text-gray-600">{user.name || user.email}</span>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="ml-3 px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:text-gray-900 border border-gray-300 hover:border-gray-400 transition-all"
+              >
+                Login
+              </Link>
+              <Link
+                href="/auth/register"
+                className="px-4 py-2 rounded-xl bg-accent text-white font-semibold text-sm hover:brightness-110 transition-all"
+                style={{ boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)' }}
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

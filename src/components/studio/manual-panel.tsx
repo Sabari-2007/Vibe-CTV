@@ -66,11 +66,11 @@ export function ManualPanel({
               key={v.id}
               type="button"
               onClick={() => onVoiceChange(v.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all duration-200 border ${
-                voiceProfile === v.id
-                  ? 'bg-accent-light border-accent/30 text-accent'
-                  : 'bg-white border-muted text-ink-light hover:border-accent/20'
-              }`}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all duration-200 border ${
+                  voiceProfile === v.id
+                    ? 'bg-accent-light border-accent/30 text-accent'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:border-accent/20'
+                }`}
             >
               <div className="font-medium">{v.label}</div>
               <div className="text-ink-light/60 mt-0.5">{v.description}</div>
@@ -87,11 +87,11 @@ export function ManualPanel({
               key={a.id}
               type="button"
               onClick={() => onAudioChange(a.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all duration-200 border flex items-center justify-between ${
-                audioTrack === a.id
-                  ? 'bg-accent-light border-accent/30 text-accent'
-                  : 'bg-white border-muted text-ink-light hover:border-accent/20'
-              }`}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all duration-200 border flex items-center justify-between ${
+                  audioTrack === a.id
+                    ? 'bg-accent-light border-accent/30 text-accent'
+                    : 'bg-white/5 border-white/10 text-white/70 hover:border-accent/20'
+                }`}
             >
               <span className="font-medium">{a.label}</span>
               <span className="text-ink-light/60">{a.duration}s</span>

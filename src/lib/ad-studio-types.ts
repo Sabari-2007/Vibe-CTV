@@ -142,6 +142,24 @@ export const VOICE_PROFILES_EXTENDED = [
   'Female, British, Calm, Mature',
 ]
 
+export const VOICE_PROFILE_LANG_MAP: Record<string, { rate: number; pitch: number; lang: string }> = {
+  'Male, American, Deep, Middle-aged': { rate: 0.85, pitch: 0.8, lang: 'en-US' },
+  'Female, British, Warm, Young-adult': { rate: 1.0, pitch: 1.1, lang: 'en-GB' },
+  'Male, British, Authoritative, Middle-aged': { rate: 0.75, pitch: 0.85, lang: 'en-GB' },
+  'Female, American, Energetic, Young-adult': { rate: 1.25, pitch: 1.2, lang: 'en-US' },
+  'Male, American, Friendly, Middle-aged': { rate: 0.95, pitch: 1.0, lang: 'en-US' },
+  'Female, British, Calm, Mature': { rate: 0.8, pitch: 0.9, lang: 'en-GB' },
+}
+
+export const VOICE_PROFILE_NAME_MAP: Record<string, string[]> = {
+  'Male, American, Deep, Middle-aged': ['Microsoft David', 'David', 'Google US English Male'],
+  'Female, British, Warm, Young-adult': ['Google UK English Female', 'Microsoft Susan', 'Female'],
+  'Male, British, Authoritative, Middle-aged': ['Google UK English Male', 'Microsoft Mark', 'Daniel'],
+  'Female, American, Energetic, Young-adult': ['Microsoft Zira', 'Zira', 'Google US English Female'],
+  'Male, American, Friendly, Middle-aged': ['Google US English', 'Microsoft David', 'Male American'],
+  'Female, British, Calm, Mature': ['Microsoft Hazel', 'Google UK English Female', 'Moira'],
+}
+
 export const FREE_STOCK_SITES = [
   { name: 'Pexels', url: 'https://pexels.com' },
   { name: 'Unsplash', url: 'https://unsplash.com' },

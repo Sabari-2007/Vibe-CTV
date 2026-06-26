@@ -1,0 +1,11 @@
+[
+  { "id": "crystal-haze", "label": "Crystal Haze", "file": "crystal-haze.mp3", "duration": 30 },
+  { "id": "driven-to-succeed", "label": "Driven to Succeed", "file": "driven-to-succeed.mp3", "duration": 30 },
+  { "id": "forward-to-the-future", "label": "Forward to the Future", "file": "forward-to-the-future.mp3", "duration": 30 },
+  { "id": "freeway-funk", "label": "Freeway Funk", "file": "freeway-funk.mp3", "duration": 30 },
+  { "id": "midnight-glitch", "label": "Midnight Glitch", "file": "midnight-glitch.mp3", "duration": 30 },
+  { "id": "rhythm-canvas", "label": "Rhythm Canvas", "file": "rhythm-canvas.mp3", "duration": 30 },
+  { "id": "rhythm-riot", "label": "Rhythm Riot", "file": "rhythm-riot.mp3", "duration": 30 },
+  { "id": "unstoppable-rhythm", "label": "Unstoppable Rhythm", "file": "unstoppable-rhythm.mp3", "duration": 30 },
+  { "id": "upward-momentum", "label": "Upward Momentum", "file": "upward-momentum.mp3", "duration": 30 }
+]

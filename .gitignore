@@ -30,6 +30,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local database (sqlite)
+prisma/dev.db
+
+# duplicate asset folders at root
+/Music
+/Mouse Click
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

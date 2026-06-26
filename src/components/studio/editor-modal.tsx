@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useStudioState } from '@/lib/state-context'
 import type { Slide } from '@/lib/ad-studio-types'
-import { MUSIC_GENRES, VOICE_PROFILES_EXTENDED, FREE_STOCK_SITES, PAID_STOCK_SITES } from '@/lib/ad-studio-types'
+import { MUSIC_GENRES, VOICE_PROFILES_EXTENDED, VOICE_PROFILE_LANG_MAP, VOICE_PROFILE_NAME_MAP, FREE_STOCK_SITES, PAID_STOCK_SITES } from '@/lib/ad-studio-types'
 import { generateQRDataUrl } from '@/lib/qrcode'
 import { audioGen } from '@/lib/audio-gen'
+import { clickSound } from '@/lib/use-click-sound'
 import { WaveformViewer, generateWaveform, readFileAsDataURL } from '@/components/studio/waveform-viewer'
 import { LivePreview } from './live-preview'
 import { TimelineBar } from './timeline-bar'
@@ -46,6 +47,7 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const fileInputSlideRef = useRef<HTMLInputElement>(null)
   const [changingSlideIndex, setChangingSlideIndex] = useState<number | null>(null)
+  const [slideImgErrors, setSlideImgErrors] = useState<Set<string>>(new Set())
 
   const totalDuration = Math.max(1, state.slides.reduce((sum, s) => sum + (s.endTime - s.startTime), 0))
 
@@ -229,7 +231,7 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => { clickSound(); setActiveTab(tab.id) }}
                 className={`w-16 py-3 rounded-xl flex flex-col items-center gap-1.5 text-[10px] transition-all ${
                   isActive
                     ? 'text-white bg-white/10 shadow-sm'
@@ -261,11 +263,26 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                     } bg-[#1a1a25] transition-all`}
                   >
                     <div className="relative aspect-video bg-[#0d0d14] group">
-                      <img
-                        src={slide.imageUrl}
-                        alt={slide.label}
-                        className="w-full h-full object-cover"
-                      />
+                      {slideImgErrors.has(slide.id) ? (
+                        <div
+                          onClick={() => handleChangeSlideImage(idx)}
+                          className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1a1a2e] to-[#0d0d14] cursor-pointer"
+                        >
+                          <div className="text-center">
+                            <svg className="w-10 h-10 mx-auto mb-2 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            <p className="text-white/30 text-xs">Click to replace image</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <img
+                          src={slide.imageUrl}
+                          alt={slide.label}
+                          className="w-full h-full object-cover"
+                          onError={() => setSlideImgErrors(prev => new Set(prev).add(slide.id))}
+                        />
+                      )}
                       <input
                         ref={fileInputSlideRef}
                         type="file"
@@ -276,6 +293,7 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                           if (f && changingSlideIndex !== null) {
                             handleSlideChange(changingSlideIndex, f)
                             setChangingSlideIndex(null)
+                            setSlideImgErrors(prev => { const next = new Set(prev); next.delete(slide.id); return next })
                           }
                         }}
                       />
@@ -465,7 +483,7 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                 onChange={(v) => updateQrCode({ enabled: v })} />
               {state.qrCode.enabled && (
                 <div className="text-center">
-                  <div className="w-40 h-40 bg-white rounded-2xl mx-auto flex items-center justify-center shadow-lg border border-white/10 overflow-hidden">
+                  <div className="w-40 h-40 bg-[#1a1a25] rounded-2xl mx-auto flex items-center justify-center shadow-lg border border-white/10 overflow-hidden">
                     {qrDataUrl ? (
                       <img src={qrDataUrl} alt="QR Code" className="w-36 h-36" />
                     ) : (
@@ -496,9 +514,10 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                       value={state.music.genre}
                       onChange={(e) => updateMusic({ genre: e.target.value })}
                       className="w-full px-3 py-2.5 bg-[#1a1a25] border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-accent/50"
+                      style={{ colorScheme: 'dark' }}
                     >
                       {MUSIC_GENRES.map((g) => (
-                        <option key={g} value={g}>{g}</option>
+                        <option key={g} value={g} style={{ background: '#1a1a25', color: '#ddd' }}>{g}</option>
                       ))}
                     </select>
                   </div>
@@ -531,16 +550,17 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs text-white/60">Preview</span>
                       <button
-                        onClick={() => {
-                          if (audioGen.getIsPlaying()) {
-                            audioGen.stop()
-                          } else {
-                            audioGen.playGenre(state.music.genre)
-                          }
-                        }}
-                        className="w-8 h-8 rounded-lg bg-accent/20 hover:bg-accent/30 flex items-center justify-center transition-colors"
-                      >
-                        {audioGen.getIsPlaying() ? (
+          onClick={() => {
+            clickSound()
+            if (audioGen.getIsPlaying()) {
+              audioGen.stop()
+            } else {
+              audioGen.playGenre(state.music.genre)
+            }
+          }}
+          className="w-8 h-8 rounded-lg bg-accent/20 hover:bg-accent/30 flex items-center justify-center transition-colors"
+        >
+          {audioGen.getIsPlaying() ? (
                           <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
@@ -619,18 +639,32 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                       value={state.voice.voiceProfile}
                       onChange={(e) => updateVoice({ voiceProfile: e.target.value })}
                       className="w-full px-3 py-2.5 bg-[#1a1a25] border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-accent/50"
+                      style={{ colorScheme: 'dark' }}
                     >
                       {VOICE_PROFILES_EXTENDED.map((vp) => (
-                        <option key={vp} value={vp}>{vp}</option>
+                        <option key={vp} value={vp} style={{ background: '#1a1a25', color: '#ddd' }}>{vp}</option>
                       ))}
                     </select>
                   </div>
                   <button
                     onClick={() => {
                       setVoiceUpdating(true)
-                      setTimeout(() => {
-                        setVoiceUpdating(false)
-                      }, 2000)
+                      const text = state.voice.script || 'Hello, this is a preview of the selected voice.'
+                      const utter = new SpeechSynthesisUtterance(text)
+                      const voiceSettings = VOICE_PROFILE_LANG_MAP[state.voice.voiceProfile]
+                      const voiceNames = VOICE_PROFILE_NAME_MAP[state.voice.voiceProfile] || ['Female']
+                      if (voiceSettings) {
+                        utter.rate = voiceSettings.rate
+                        utter.pitch = voiceSettings.pitch
+                        utter.lang = voiceSettings.lang
+                      }
+                      const voices = window.speechSynthesis.getVoices()
+                      const matched = voices.find(v => voiceNames.some(n => v.name.includes(n)))
+                      if (matched) utter.voice = matched
+                      window.speechSynthesis.cancel()
+                      window.speechSynthesis.speak(utter)
+                      utter.onend = () => setVoiceUpdating(false)
+                      utter.onerror = () => setVoiceUpdating(false)
                     }}
                     disabled={voiceUpdating}
                     className="w-full py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:brightness-110 transition-all disabled:opacity-50"
@@ -641,9 +675,9 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        Updating...
+                        Playing...
                       </span>
-                    ) : 'Update voice'}
+                    ) : 'Preview voice'}
                   </button>
                 </>
               )}
@@ -890,7 +924,7 @@ export function EditorModal({ onClose }: { onClose: () => void }) {
               <span>{state.music.enabled ? 'Music: ON' : 'Music: OFF'}</span>
             </div>
             <button
-              onClick={() => setShowExport(true)}
+              onClick={() => { clickSound(); setShowExport(true) }}
               className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-accent to-purple-600 text-white font-semibold text-sm hover:brightness-110 transition-all shadow-lg shadow-accent/25"
             >
               Save and continue

@@ -300,16 +300,23 @@ export async function renderVideo(
     const data = buf.getChannelData(0)
 
     const bpm = getGenreBPM(audio.genre)
-    const beatMs = 60 / bpm
-    const beatSamples = Math.floor(beatMs * sampleRate)
+    const beatS = 60 / bpm
 
     for (let i = 0; i < numSamples; i++) {
       const t = i / sampleRate
-      const beatIdx = Math.floor(t / beatMs) % frequencies.length
+      const beatIdx = floorMod(Math.floor(t / beatS), frequencies.length)
       const freq = frequencies[beatIdx]
-      const envelope = Math.max(0, 1 - ((t % beatMs) / beatMs) * 2)
-      data[i] = Math.sin(2 * Math.PI * freq * t) * envelope * 0.15
-      data[i] += Math.sin(2 * Math.PI * freq * 0.5 * t) * envelope * 0.08
+
+      const beatPhase = (t % beatS) / beatS
+      let envelope = 1.0 - beatPhase * 0.3
+      envelope = Math.max(0.7, envelope)
+
+      const fadeOut = Math.min(1, (duration - t) / 0.5)
+      if (fadeOut < 1) envelope *= fadeOut
+      if (fadeOut <= 0) { data[i] = 0; continue }
+
+      data[i] = Math.sin(2 * Math.PI * freq * t) * envelope * 0.12
+      data[i] += Math.sin(2 * Math.PI * freq * 0.5 * t) * envelope * 0.06
     }
 
     const wavBuffer = audioBufferToWav(buf)
@@ -407,4 +414,8 @@ function writeString(view: DataView, offset: number, string: string) {
   for (let i = 0; i < string.length; i++) {
     view.setUint8(offset + i, string.charCodeAt(i))
   }
+}
+
+function floorMod(a: number, b: number): number {
+  return ((a % b) + b) % b
 }

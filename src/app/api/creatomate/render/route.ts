@@ -1,20 +1,37 @@
 import { NextResponse } from 'next/server'
+import { sanitizeString, sanitizeArray } from '@/lib/sanitize'
 
-const CREATOMATE_API_KEY = 'fde2311bb2f44f2e81f8f5894e175965fe2a7d849147ccd80d72759ba8e3a7fe1bd6003b7457c076e76c8b0ea26bb9b1'
+const CREATOMATE_API_KEY = process.env.CREATOMATE_API_KEY || ''
 const CREATOMATE_API = 'https://api.creatomate.com/v1'
+
+if (!CREATOMATE_API_KEY) {
+  console.error('CREATOMATE_API_KEY is not set in environment variables')
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { slides, brandName, tagline, featureBullets, bottomBanner, endScreen, musicGenre, script, voiceProfile, logoUrl } = body
+
+    if (!body.slides || !Array.isArray(body.slides) || body.slides.length === 0) {
+      return NextResponse.json({ error: 'At least one slide is required' }, { status: 400 })
+    }
+
+    const slides = sanitizeArray(body.slides, 100)
+    const brandName = sanitizeString(body.brandName, 200)
+    const tagline = sanitizeString(body.tagline, 500)
+    const featureBullets = sanitizeArray<string>(body.featureBullets, 20)
+    const script = sanitizeString(body.script, 10000)
+    const voiceProfile = sanitizeString(body.voiceProfile, 200)
+    const musicGenre = sanitizeString(body.musicGenre, 100)
+    const logoUrl = sanitizeString(body.logoUrl, 2000)
 
     const template = buildTemplate({
       slides,
       brandName,
       tagline,
       featureBullets,
-      bottomBanner,
-      endScreen,
+      bottomBanner: body.bottomBanner || null,
+      endScreen: body.endScreen || null,
       musicGenre,
       script,
       voiceProfile,
@@ -49,11 +66,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const renderId = searchParams.get('renderId')
 
-    if (!renderId) {
-      return NextResponse.json({ error: 'renderId is required' }, { status: 400 })
+    if (!renderId || renderId.length > 200) {
+      return NextResponse.json({ error: 'Invalid renderId' }, { status: 400 })
     }
 
-    const response = await fetch(`${CREATOMATE_API}/renders/${renderId}`, {
+    const response = await fetch(`${CREATOMATE_API}/renders/${encodeURIComponent(renderId)}`, {
       headers: {
         'Authorization': `Bearer ${CREATOMATE_API_KEY}`,
         'Content-Type': 'application/json',
@@ -133,7 +150,7 @@ function buildTemplate(params: {
         type: 'RoundedRectangle',
         duration: (slide.endTime - slide.startTime),
         x: '5%', y: `${88 + i * 5}%`,
-        width: `${params.featureBullets[i].length * 12 + 30}px`,
+        width: `${Math.min(params.featureBullets[i].length * 12 + 30, 300)}px`,
         height: '32px',
         fillColor: '#ffffff20',
         borderRadius: '16px',
@@ -165,7 +182,7 @@ function buildTemplate(params: {
   if (params.bottomBanner?.companyName) {
     elements.push({
       type: 'RoundedRectangle',
-      duration: params.slides.length > 0 ? params.slides.length * 4 - 4 : 20,
+      duration: Math.max(1, params.slides.length * 4 - 4),
       x: '0', y: '90%',
       width: '100%', height: '10%',
       fillColor: '#fffffff0',
@@ -173,19 +190,19 @@ function buildTemplate(params: {
     elements.push({
       type: 'Text',
       text: params.bottomBanner.companyName,
-      duration: params.slides.length > 0 ? params.slides.length * 4 - 4 : 20,
+      duration: Math.max(1, params.slides.length * 4 - 4),
       x: '5%', y: '91%',
       width: '50%', height: '8%',
       fontSize: '16px',
       color: '#000000',
-        fontFamily: 'Instrument Sans',
+      fontFamily: 'Instrument Sans',
       fontWeight: 'bold',
     })
     if (params.bottomBanner.websiteUrl) {
       elements.push({
         type: 'Text',
         text: params.bottomBanner.websiteUrl,
-        duration: params.slides.length > 0 ? params.slides.length * 4 - 4 : 20,
+        duration: Math.max(1, params.slides.length * 4 - 4),
         x: '60%', y: '91%',
         width: '35%', height: '8%',
         fontSize: '12px',
@@ -227,7 +244,7 @@ function buildTemplate(params: {
       width: '80%', height: '10%',
       fontSize: '18px',
       color: '#ffffffb0',
-        fontFamily: 'Instrument Sans',
+      fontFamily: 'Instrument Sans',
       alignment: 'center',
     })
   }

@@ -234,7 +234,7 @@ function TrackRow({ label, color, active, waveform }: { label: string; color: st
         )}
       </div>
       <div className="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-        style={{ backgroundColor: active ? color : '#ffffff20' }}
+        style={{ backgroundColor: active ? color : '#ffffff10' }}
       />
     </div>
   )

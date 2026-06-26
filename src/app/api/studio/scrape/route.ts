@@ -10,6 +10,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 })
+    }
+
+    const parsed = new URL(url)
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return NextResponse.json({ error: 'Only http and https URLs are allowed' }, { status: 400 })
+    }
+
     const logs: ScrapeLog[] = []
 
     const data = await scrapeUrl(url, (log) => {

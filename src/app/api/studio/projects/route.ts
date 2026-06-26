@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sanitizeString, sanitizeArray } from '@/lib/sanitize'
 
 export async function GET() {
   try {
     const projects = await prisma.videoProject.findMany({
       orderBy: { createdAt: 'desc' },
+      take: 50,
     })
 
     const data = projects.map((p) => ({
@@ -31,17 +33,28 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, sourceUrl, script, voiceProfile, audioTrack, tracks, assets } = body
+
+    const name = sanitizeString(body.name, 200) || 'Untitled Project'
+    const sourceUrl = sanitizeString(body.sourceUrl, 2000)
+    const script = sanitizeString(body.script, 10000)
+    const voiceProfile = sanitizeString(body.voiceProfile, 200)
+    const audioTrack = sanitizeString(body.audioTrack, 200)
+    const tracks = sanitizeArray(body.tracks, 200)
+    const assets = sanitizeArray(body.assets, 200)
+
+    if (sourceUrl && !sourceUrl.startsWith('http://') && !sourceUrl.startsWith('https://')) {
+      return NextResponse.json({ error: 'Invalid sourceUrl format' }, { status: 400 })
+    }
 
     const project = await prisma.videoProject.create({
       data: {
-        name: name || 'Untitled Project',
+        name,
         sourceUrl: sourceUrl || null,
         script: script || null,
         voiceProfile: voiceProfile || null,
         audioTrack: audioTrack || null,
-        tracks: JSON.stringify(tracks || []),
-        assets: JSON.stringify(assets || []),
+        tracks: JSON.stringify(tracks),
+        assets: JSON.stringify(assets),
       },
     })
 

@@ -3,7 +3,7 @@
 export class AudioGenerator {
   private ctx: AudioContext | null = null
   private nodes: OscillatorNode[] = []
-  private gain: GainNode | null = null
+  private masterGain: GainNode | null = null
   private isPlaying = false
 
   private getContext(): AudioContext {
@@ -21,34 +21,42 @@ export class AudioGenerator {
     const ctx = this.getContext()
     if (ctx.state === 'suspended') await ctx.resume()
 
-    this.gain = ctx.createGain()
-    this.gain.gain.value = 0.15
-    this.gain.connect(ctx.destination)
+    this.masterGain = ctx.createGain()
+    this.masterGain.gain.value = 0.15
+    this.masterGain.connect(ctx.destination)
 
     const patterns = this.getPatterns(genre)
     const bpm = patterns.bpm
     const beatDuration = 60 / bpm
     const now = ctx.currentTime
+    const totalDuration = 30
+    const totalBeats = Math.ceil(totalDuration / (beatDuration * patterns.noteDivision))
 
-    patterns.notes.forEach((note, i) => {
+    for (let i = 0; i < totalBeats; i++) {
+      const note = patterns.notes[i % patterns.notes.length]
       const startTime = now + i * beatDuration * patterns.noteDivision
+      const noteLength = beatDuration * patterns.noteDivision * 0.8
+      const fadeOut = Math.min(0.05, noteLength * 0.3)
+
       const osc = ctx.createOscillator()
       const noteGain = ctx.createGain()
 
       osc.type = note.waveform as OscillatorType
       osc.frequency.value = note.freq
+
       noteGain.gain.setValueAtTime(0, startTime)
-      noteGain.gain.linearRampToValueAtTime(note.volume, startTime + 0.02)
-      noteGain.gain.linearRampToValueAtTime(0, startTime + beatDuration * patterns.noteDivision * 0.9)
+      noteGain.gain.linearRampToValueAtTime(note.volume, startTime + 0.01)
+      noteGain.gain.linearRampToValueAtTime(note.volume, startTime + noteLength - fadeOut)
+      noteGain.gain.linearRampToValueAtTime(0, startTime + noteLength)
 
       osc.connect(noteGain)
-      noteGain.connect(this.gain!)
+      noteGain.connect(this.masterGain)
 
       osc.start(startTime)
-      osc.stop(startTime + beatDuration * patterns.noteDivision)
+      osc.stop(startTime + noteLength)
 
       this.nodes.push(osc)
-    })
+    }
 
     this.isPlaying = true
   }
@@ -81,14 +89,14 @@ export class AudioGenerator {
         bpm: 140,
         noteDivision: 0.5,
         notes: [
-          { freq: 110, waveform: 'sawtooth', volume: 0.2 },
-          { freq: 220, waveform: 'square', volume: 0.15 },
-          { freq: 146.83, waveform: 'sawtooth', volume: 0.2 },
-          { freq: 110, waveform: 'square', volume: 0.15 },
-          { freq: 164.81, waveform: 'sawtooth', volume: 0.2 },
-          { freq: 110, waveform: 'square', volume: 0.15 },
-          { freq: 196, waveform: 'sawtooth', volume: 0.2 },
-          { freq: 110, waveform: 'square', volume: 0.15 },
+          { freq: 110, waveform: 'sawtooth', volume: 0.15 },
+          { freq: 220, waveform: 'square', volume: 0.1 },
+          { freq: 146.83, waveform: 'sawtooth', volume: 0.15 },
+          { freq: 110, waveform: 'square', volume: 0.1 },
+          { freq: 164.81, waveform: 'sawtooth', volume: 0.15 },
+          { freq: 110, waveform: 'square', volume: 0.1 },
+          { freq: 196, waveform: 'sawtooth', volume: 0.15 },
+          { freq: 110, waveform: 'square', volume: 0.1 },
         ],
       },
       Upbeat: {
@@ -137,14 +145,14 @@ export class AudioGenerator {
         bpm: 130,
         noteDivision: 0.25,
         notes: [
-          { freq: 440, waveform: 'square', volume: 0.2 },
-          { freq: 55, waveform: 'sawtooth', volume: 0.3 },
-          { freq: 440, waveform: 'square', volume: 0.2 },
-          { freq: 55, waveform: 'sawtooth', volume: 0.3 },
-          { freq: 554.37, waveform: 'square', volume: 0.2 },
-          { freq: 55, waveform: 'sawtooth', volume: 0.3 },
-          { freq: 554.37, waveform: 'square', volume: 0.2 },
-          { freq: 55, waveform: 'sawtooth', volume: 0.3 },
+          { freq: 440, waveform: 'square', volume: 0.15 },
+          { freq: 55, waveform: 'sawtooth', volume: 0.2 },
+          { freq: 440, waveform: 'square', volume: 0.15 },
+          { freq: 55, waveform: 'sawtooth', volume: 0.2 },
+          { freq: 554.37, waveform: 'square', volume: 0.15 },
+          { freq: 55, waveform: 'sawtooth', volume: 0.2 },
+          { freq: 554.37, waveform: 'square', volume: 0.15 },
+          { freq: 55, waveform: 'sawtooth', volume: 0.2 },
         ],
       },
       Ambient: {

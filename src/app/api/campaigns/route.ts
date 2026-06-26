@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sanitizeString, sanitizeNumber, sanitizeArray } from '@/lib/sanitize'
 
 export async function GET() {
   try {
@@ -10,6 +11,7 @@ export async function GET() {
         },
       },
       orderBy: { createdAt: 'desc' },
+      take: 100,
     })
 
     const data = campaigns.map((c) => ({
@@ -37,35 +39,41 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, dailyBudget, totalBudget, genres, locations, videoUrl } = body
+    const name = sanitizeString(body.name, 200)
+    const videoUrl = sanitizeString(body.videoUrl, 2000)
+    const dailyBudget = sanitizeNumber(body.dailyBudget, 50)
+    const totalBudget = sanitizeNumber(body.totalBudget, 50)
+    const genres = sanitizeArray(body.genres, 20)
+    const locations = sanitizeArray(body.locations, 20)
 
-    if (!name || !name.trim()) {
+    if (!name) {
       return NextResponse.json({ error: 'Campaign name is required' }, { status: 400 })
     }
 
-    const daily = Number(dailyBudget)
-    const total = Number(totalBudget)
-
-    if (isNaN(daily) || daily < 50) {
-      return NextResponse.json({ error: 'Minimum daily budget is $50' }, { status: 400 })
-    }
-
-    if (isNaN(total) || total < daily) {
-      return NextResponse.json({ error: 'Total budget must be at least the daily budget' }, { status: 400 })
+    if (videoUrl && !videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
+      return NextResponse.json({ error: 'Invalid videoUrl format' }, { status: 400 })
     }
 
     const campaign = await prisma.campaign.create({
       data: {
-        name: name.trim(),
-        dailyBudget: daily,
-        totalBudget: total,
-        genres: JSON.stringify(genres || []),
-        locations: JSON.stringify(locations || []),
+        name,
+        dailyBudget,
+        totalBudget,
+        spent: 0,
+        genres: JSON.stringify(genres),
+        locations: JSON.stringify(locations),
         videoUrl: videoUrl || null,
       },
     })
 
-    return NextResponse.json(campaign, { status: 201 })
+    return NextResponse.json({
+      id: campaign.id,
+      name: campaign.name,
+      status: campaign.status,
+      dailyBudget: campaign.dailyBudget,
+      totalBudget: campaign.totalBudget,
+      createdAt: campaign.createdAt.toISOString(),
+    }, { status: 201 })
   } catch (error) {
     console.error('POST /api/campaigns error:', error)
     return NextResponse.json({ error: 'Failed to create campaign' }, { status: 500 })

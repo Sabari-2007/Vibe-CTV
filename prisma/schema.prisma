@@ -3,14 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id        String     @id @default(cuid())
   name      String?
-  email     String?    @unique
+  email     String    @unique
+  password  String
+  token     String?
   campaigns Campaign[]
   createdAt DateTime   @default(now())
 }

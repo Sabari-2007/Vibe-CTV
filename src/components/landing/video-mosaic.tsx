@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 
 const ITEMS = [
@@ -154,13 +155,15 @@ export function VideoMosaic() {
             <h1 className="text-[2rem] md:text-[2.8rem] lg:text-[3.2rem] font-bold text-[#0F172A] leading-[1.1] tracking-tight">
               Put your brand next to content your customers love
             </h1>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.97 }}
-              className="mt-6 px-8 py-4 bg-[#0F172A] text-white rounded-xl font-semibold text-base hover:shadow-xl transition-shadow pointer-events-auto"
-            >
-              Start a campaign
-            </motion.button>
+            <Link href="/campaign/new">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.97 }}
+                className="mt-6 px-8 py-4 bg-[#0F172A] text-white rounded-xl font-semibold text-base hover:shadow-xl transition-shadow pointer-events-auto"
+              >
+                Start a campaign
+              </motion.button>
+            </Link>
           </div>
         </div>
       </div>
