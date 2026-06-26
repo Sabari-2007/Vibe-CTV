@@ -43,42 +43,44 @@ export default function StudioRoute() {
 
   if (stage === 'landing') {
     return (
-      <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a0f] flex flex-col items-center justify-center relative overflow-hidden">
+      <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a0f] flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-[#4f8cff]/5 via-transparent to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#4f8cff]/5 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#4f8cff]/5 rounded-full blur-[100px]" />
 
-        <div className="relative z-10 w-full max-w-2xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] text-white/60 mb-6">
+        <div className="relative z-10 w-full max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] sm:text-[10px] text-white/60 mb-4 sm:mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             AI-Powered Video Studio
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-3 tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight mb-2 sm:mb-3 tracking-tight px-2 sm:px-0">
             Turn a Website Into
             <span className="bg-gradient-to-r from-[#4f8cff] to-purple-400 bg-clip-text text-transparent"> a Video Ad</span>
           </h1>
 
-          <p className="text-sm text-white/60 mb-6 max-w-md mx-auto">
+          <p className="text-xs sm:text-sm text-white/60 mb-4 sm:mb-6 max-w-md mx-auto px-4 sm:px-0">
             Enter a URL to scrape images and auto-generate your video.
           </p>
 
-          <div className="relative max-w-lg mx-auto">
-            <div className="relative flex items-center">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleScrape()}
-                placeholder="https://example.com"
-                className="w-full pl-9 pr-28 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#4f8cff]/50 focus:ring-2 focus:ring-[#4f8cff]/20 transition-all"
-              />
+          <div className="relative max-w-lg mx-auto px-2 sm:px-0">
+            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0">
+              <div className="relative flex-1">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 sm:w-4 h-3.5 sm:h-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleScrape()}
+                  placeholder="https://example.com"
+                  className="w-full pl-9 pr-4 sm:pr-28 py-2.5 bg-white/5 border border-white/10 rounded-lg sm:rounded-r-none text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#4f8cff]/50 focus:ring-2 focus:ring-[#4f8cff]/20 transition-all"
+                />
+              </div>
               <button
                 onClick={handleScrape}
                 disabled={scraping || !query.trim()}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 px-4 py-1.5 rounded-md bg-gradient-to-r from-[#4f8cff] to-[#6c5ce7] text-white text-xs font-semibold hover:brightness-110 transition-all disabled:opacity-40"
+                className="sm:absolute sm:right-1.5 sm:top-1/2 sm:-translate-y-1/2 px-4 py-2 sm:py-1.5 rounded-lg sm:rounded-md bg-gradient-to-r from-[#4f8cff] to-[#6c5ce7] text-white text-xs font-semibold hover:brightness-110 transition-all disabled:opacity-40"
               >
                 {scraping ? 'Scraping...' : 'Generate'}
               </button>

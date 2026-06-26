@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
   BarChart,
@@ -13,21 +13,25 @@ import {
   Cell,
 } from 'recharts'
 
-function generateCurveData(budget: number) {
-  return Array.from({ length: 11 }, (_, i) => {
-    const b = (budget / 10) * i
-    const reach = Math.round(b * 45 * (1 + Math.sin((i / 10) * Math.PI) * 0.3))
-    return { budget: b, reach }
-  })
-}
-
 export function GrowthMatrix() {
   const [budget, setBudget] = useState(5000)
-  const data = generateCurveData(budget)
+  const [data, setData] = useState<{ budget: number; reach: number }[]>([])
+  const [metrics, setMetrics] = useState({ totalReach: '0', frequency: '3.2x', effectiveReach: '0', avgCpm: '0', totalHistoricalImpressions: 0 })
+  const [loading, setLoading] = useState(true)
+  const fetching = useRef(false)
 
-  const totalReach = Math.round(budget * 45)
-  const frequency = 3.2
-  const effectiveReach = Math.round(totalReach / frequency)
+  useEffect(() => {
+    if (fetching.current) return
+    fetching.current = true
+    fetch(`/api/audience-predict?budget=${budget}`)
+      .then(r => r.json())
+      .then(json => {
+        setData(json.data)
+        setMetrics(json.metrics)
+      })
+      .catch(() => {})
+      .finally(() => { fetching.current = false; setLoading(false) })
+  }, [budget])
 
   return (
     <section className="py-12 relative bg-canvas">
@@ -47,10 +51,15 @@ export function GrowthMatrix() {
           </p>
         </motion.div>
 
-        <div className="card p-8">
-          <div className="grid lg:grid-cols-5 gap-8">
+        <div className="card p-4 md:p-8">
+          <div className="grid md:grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8">
             <div className="lg:col-span-3">
-              <div className="h-[320px]">
+              {loading ? (
+                <div className="h-[200px] md:h-[320px] flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+              <div className="h-[200px] md:h-[320px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
@@ -90,6 +99,7 @@ export function GrowthMatrix() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </div>
 
             <div className="lg:col-span-2 space-y-6">
@@ -114,9 +124,9 @@ export function GrowthMatrix() {
 
               <div className="space-y-3">
                 {[
-                  { label: 'Total Population Reach', value: totalReach.toLocaleString(), sub: 'Budget × 45 impressions', color: 'text-accent' },
-                  { label: 'Est. Frequency Multiplier', value: `${frequency}×`, sub: 'Average exposure window', color: 'text-success' },
-                  { label: 'Effective Unique Reach', value: effectiveReach.toLocaleString(), sub: 'After frequency adjustment', color: 'text-ink' },
+                  { label: 'Total Population Reach', value: metrics.totalReach, sub: `Based on $${metrics.avgCpm} avg CPM${metrics.totalHistoricalImpressions > 0 ? ` from ${metrics.totalHistoricalImpressions.toLocaleString()} historical impressions` : ''}`, color: 'text-accent' },
+                  { label: 'Est. Frequency Multiplier', value: metrics.frequency, sub: 'Average exposure window', color: 'text-success' },
+                  { label: 'Effective Unique Reach', value: metrics.effectiveReach, sub: 'After frequency adjustment', color: 'text-ink' },
                 ].map((metric, i) => (
                   <motion.div
                     key={metric.label}

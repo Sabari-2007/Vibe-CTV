@@ -170,6 +170,8 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
   const [collapsedTracks, setCollapsedTracks] = useState<Set<string>>(new Set())
   const [showExportModal, setShowExportModal] = useState(false)
   const [showMediaMenu, setShowMediaMenu] = useState(false)
+  const [showLeftPanel, setShowLeftPanel] = useState(false)
+  const [showRightPanel, setShowRightPanel] = useState(false)
   const [volume, setVolume] = useState(1)
   const [playbackSpeed, setPlaybackSpeed] = useState(1)
   const [showSpeedMenu, setShowSpeedMenu] = useState(false)
@@ -1403,8 +1405,23 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="w-60 bg-[#16162a] border-r border-white/[0.06] flex flex-col shrink-0">
-          <div className="flex border-b border-white/[0.06]">
+        <button
+          onClick={() => setShowLeftPanel(!showLeftPanel)}
+          className="lg:hidden fixed left-2 top-[50%] -translate-y-1/2 z-50 w-8 h-8 rounded-full bg-[#252540] border border-white/[0.08] flex items-center justify-center shadow-xl hover:bg-[#2a2a4a] transition-all"
+          title="Toggle Media Panel"
+        >
+          <svg className="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+
+        {showLeftPanel && (
+          <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowLeftPanel(false)} />
+        )}
+
+        <div className={`${showLeftPanel ? 'fixed left-0 top-0 bottom-0 z-50' : 'hidden'} lg:flex lg:w-60 bg-[#16162a] border-r border-white/[0.06] flex-col shrink-0`}>
+        <div className="flex items-center border-b border-white/[0.06]">
+          <div className="flex flex-1">
             {(['media', 'transitions', 'effects'] as Panel[]).map((panel) => (
               <button
                 key={panel}
@@ -1419,6 +1436,15 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
               </button>
             ))}
           </div>
+          <button
+            onClick={() => setShowLeftPanel(false)}
+            className="lg:hidden w-7 h-7 mr-1 rounded-lg hover:bg-white/[0.08] flex items-center justify-center text-white/40 hover:text-white transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
           <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
             {activePanel === 'media' && (
@@ -2222,7 +2248,21 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
           </div>
         )}
 
-        <div className="w-72 bg-[#16162a] border-l border-white/[0.06] flex flex-col shrink-0">
+        <button
+          onClick={() => setShowRightPanel(!showRightPanel)}
+          className="lg:hidden fixed right-2 top-[50%] -translate-y-1/2 z-50 w-8 h-8 rounded-full bg-[#252540] border border-white/[0.08] flex items-center justify-center shadow-xl hover:bg-[#2a2a4a] transition-all"
+          title="Toggle Editor Panel"
+        >
+          <svg className="w-3.5 h-3.5 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5z" />
+          </svg>
+        </button>
+
+        {showRightPanel && (
+          <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setShowRightPanel(false)} />
+        )}
+
+        <div className={`${showRightPanel ? 'fixed right-0 top-0 bottom-0 z-50' : 'hidden'} lg:flex lg:w-72 bg-[#16162a] border-l border-white/[0.06] flex-col shrink-0`}>
           {selectedClip && (
             <div className="p-3 border-b border-white/[0.06] space-y-2 max-h-48 overflow-y-auto shrink-0">
               <div className="flex items-center justify-between">
@@ -2314,20 +2354,30 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
               )}
             </div>
           )}
-          <div className="flex border-b border-white/[0.06]">
-            {(['voice-script', 'music', 'qr', 'export'] as EditorTab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => { clickSound(); setActiveEditorTab(tab) }}
-                className={`flex-1 py-2.5 text-[10px] font-medium uppercase tracking-wider transition-all ${
-                  activeEditorTab === tab
-                    ? 'text-[#4f8cff] bg-[#4f8cff]/[0.06] border-b-2 border-[#4f8cff]'
-                    : 'text-white/30 hover:text-white/60'
-                }`}
-              >
-                {tab === 'voice-script' ? 'Voice & Script' : tab === 'qr' ? 'QR Code' : tab === 'export' ? 'Export' : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+          <div className="flex items-center border-b border-white/[0.06]">
+            <div className="flex flex-1">
+              {(['voice-script', 'music', 'qr', 'export'] as EditorTab[]).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => { clickSound(); setActiveEditorTab(tab) }}
+                  className={`flex-1 py-2.5 text-[10px] font-medium uppercase tracking-wider transition-all ${
+                    activeEditorTab === tab
+                      ? 'text-[#4f8cff] bg-[#4f8cff]/[0.06] border-b-2 border-[#4f8cff]'
+                      : 'text-white/30 hover:text-white/60'
+                  }`}
+                >
+                  {tab === 'voice-script' ? 'Voice & Script' : tab === 'qr' ? 'QR Code' : tab === 'export' ? 'Export' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowRightPanel(false)}
+              className="lg:hidden w-7 h-7 mr-1 rounded-lg hover:bg-white/[0.08] flex items-center justify-center text-white/40 hover:text-white transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">

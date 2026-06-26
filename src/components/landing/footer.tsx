@@ -5,8 +5,8 @@ import { motion } from 'framer-motion'
 export function GlobalFooter() {
   return (
     <footer className="border-t border-muted bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
@@ -87,9 +87,9 @@ export function GlobalFooter() {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-muted flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink-light/60">
+        <div className="mt-6 pt-4 border-t border-muted flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-ink-light/60">
           <span>&copy; {new Date().getFullYear()} Vibe. All rights reserved.</span>
-          <span>Powered by Next.js + Prisma + SQLite</span>
+          <span>Powered by Next.js + Prisma + PostgreSQL</span>
         </div>
       </div>
     </footer>
