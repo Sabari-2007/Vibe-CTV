@@ -20,7 +20,7 @@ const RESPONSES: Record<string, string> = {
 export function BuddyWidget() {
   const [open, setOpen] = useState(false)
   const [chat, setChat] = useState<{ type: 'bot' | 'user'; text: string }[]>([
-    { type: 'bot', text: 'Hi! I\'m your Vibe assistant. How can I help you today?' },
+    { type: 'bot', text: 'Hi! I\'m your Lumina assistant. How can I help you today?' },
   ])
   const [input, setInput] = useState('')
 
@@ -68,7 +68,7 @@ export function BuddyWidget() {
           >
             <div className="bg-accent px-4 py-3 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-              <span className="text-white text-sm font-semibold">Vibe Assistant</span>
+              <span className="text-white text-sm font-semibold">Lumina Assistant</span>
               <span className="text-white/70 text-xs ml-auto">Online</span>
             </div>
 

@@ -38,7 +38,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Create an account</h1>
-          <p className="mt-2 text-gray-600">Get started with Vibe</p>
+          <p className="mt-2 text-gray-600">Get started with Lumina</p>
         </div>
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4">
           {error && (

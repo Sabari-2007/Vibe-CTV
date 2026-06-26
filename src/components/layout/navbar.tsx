@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -29,11 +30,9 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-            <span className="text-white font-bold text-sm">V</span>
-          </div>
-          <span className="font-semibold text-ink">Vibe</span>
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <Image src="/lumina-logo.png" alt="Lumina" width={40} height={40} className="rounded-lg" />
+          <span className="text-xl font-semibold text-ink" style={{ fontFamily: "'Stack Sans Notch', sans-serif" }}>Lumina</span>
         </Link>
 
         <button

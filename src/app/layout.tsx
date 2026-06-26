@@ -4,8 +4,12 @@ import { Navbar } from '@/components/layout/navbar'
 import { GlobalFooter } from '@/components/landing/footer'
 
 export const metadata: Metadata = {
-  title: 'Vibe — CTV Advertising Platform',
+  title: 'Lumina — CTV Advertising Platform',
   description: 'Programmatic CTV advertising platform with real-time analytics',
+  icons: [
+    { rel: 'icon', url: '/lumina-logo.png', sizes: 'any' },
+    { rel: 'apple-touch-icon', url: '/lumina-logo.png' },
+  ],
 }
 
 export default function RootLayout({

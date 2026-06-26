@@ -45,7 +45,7 @@ export default function StudioRoute() {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[#0a0a0f] flex flex-col items-center justify-center relative overflow-hidden px-4 sm:px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-[#4f8cff]/5 via-transparent to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#4f8cff]/5 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-[#4f8cff]/20 rounded-full blur-[100px]" />
 
         <div className="relative z-10 w-full max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] sm:text-[10px] text-white/60 mb-4 sm:mb-6">

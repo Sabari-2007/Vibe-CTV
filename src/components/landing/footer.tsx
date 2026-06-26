@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 export function GlobalFooter() {
@@ -9,10 +10,8 @@ export function GlobalFooter() {
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
-              <span className="font-semibold text-ink">Vibe</span>
+              <Image src="/lumina-logo.png" alt="Lumina" width={32} height={32} className="rounded-lg" />
+              <span className="font-semibold text-ink" style={{ fontFamily: "'Stack Sans Notch', sans-serif" }}>Lumina</span>
             </div>
             <p className="text-sm text-ink-light leading-relaxed">
               AI-powered programmatic CTV advertising platform. Real-time analytics, smart targeting, and creative studio.
@@ -88,7 +87,7 @@ export function GlobalFooter() {
         </div>
 
         <div className="mt-6 pt-4 border-t border-muted flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-[10px] sm:text-xs text-ink-light/60">
-          <span>&copy; {new Date().getFullYear()} Vibe. All rights reserved.</span>
+          <span>&copy; {new Date().getFullYear()} Lumina. All rights reserved.</span>
           <span>Powered by Next.js + Prisma + PostgreSQL</span>
         </div>
       </div>

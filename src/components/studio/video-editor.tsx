@@ -198,10 +198,10 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
   const exportCanvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const seen = localStorage.getItem('vibe-onboarding-seen')
+    const seen = localStorage.getItem('lumina-onboarding-seen')
     if (!seen) {
       setShowOnboarding(true)
-      localStorage.setItem('vibe-onboarding-seen', 'true')
+      localStorage.setItem('lumina-onboarding-seen', 'true')
     }
   }, [])
 
@@ -1259,13 +1259,13 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
       setOnboardingStep(onboardingStep + 1)
     } else {
       setShowOnboarding(false)
-      localStorage.setItem('vibe-onboarding-seen', 'true')
+      localStorage.setItem('lumina-onboarding-seen', 'true')
     }
   }
 
   const handleSkipOnboarding = () => {
     setShowOnboarding(false)
-    localStorage.setItem('vibe-onboarding-seen', 'true')
+    localStorage.setItem('lumina-onboarding-seen', 'true')
   }
 
   return (
@@ -1280,7 +1280,7 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
               <rect x="1" y="5" width="15" height="14" rx="2" />
             </svg>
           </div>
-          <span className="text-white font-semibold text-sm">Vibe Studio</span>
+          <span className="text-white font-semibold text-sm">Lumina Studio</span>
         </div>
 
           <div ref={menuRef} className="flex items-center gap-2 text-xs relative">
@@ -2710,7 +2710,7 @@ export function VideoEditor({ onClose, initialSlides, initialBrand, sourceUrl }:
                   {exportStatus === 'done' && exportUrl && (
                     <a
                       href={exportUrl}
-                      download="vibe-studio-export.webm"
+                      download="lumina-studio-export.webm"
                       className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#4f8cff] to-[#6c5ce7] text-white text-xs font-semibold hover:brightness-110 transition-all shadow-lg shadow-[#4f8cff]/20 text-center block"
                     >
                       Download Video
